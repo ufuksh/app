@@ -2,9 +2,15 @@ pipeline {
     agent any
 
     environment {
-        // Gerekli ortam değişkenlerini burada tanımlayabilirsiniz.
+        // Timeout değeri eklendi
+        ANSIBLE_TIMEOUT = '60' // seconds
         INVENTORY = '3.120.129.244,'
-        PLAYBOOK = '../ansible/playbook.yml'
+        PLAYBOOK = '/var/lib/jenkins/workspace/eco/ansible/playbook.yml'
+    }
+
+    options {
+        // Pipeline timeout eklendi
+        timeout(time: 5, unit: 'MINUTES')
     }
 
     stages {
@@ -13,11 +19,30 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Run Ansible Playbook') {
+        stage('Test Connection') {
             steps {
-                // Ansible playbook'unuzu belirtilen envanter ile çalıştırır.
-                sh "ansible-playbook -i ${INVENTORY} ${PLAYBOOK}"
+                // Verbose mod ile bağlantı testi
+                sh "ansible -i ${INVENTORY} all -m ping -vvv"
             }
+        }
+        
+        stage('Deploy with Ansible') {
+            steps {
+                // Timeout ve verbose mod eklendi
+                sh "ANSIBLE_TIMEOUT=${ANSIBLE_TIMEOUT} ansible-playbook -i ${INVENTORY} ${PLAYBOOK} -vvv"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment başarılı!'
+        }
+        failure {
+            echo 'Deployment başarısız!'
+        }
+        aborted {
+            echo 'Pipeline iptal edildi!'
         }
     }
 }
