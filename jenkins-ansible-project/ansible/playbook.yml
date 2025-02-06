@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: 3.120.129.244
   become: true
   roles:
     - common
