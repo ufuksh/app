@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    environment {
+        // Gerekli ortam değişkenlerini burada tanımlayabilirsiniz.
+        INVENTORY = '3.120.129.244,'
+        PLAYBOOK = '../ansible/playbook.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Run Ansible Playbook') {
+            steps {
+                // Ansible playbook'unuzu belirtilen envanter ile çalıştırır.
+                sh "ansible-playbook -i ${INVENTORY} ${PLAYBOOK}"
+            }
+        }
+    }
+}
