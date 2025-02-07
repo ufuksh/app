@@ -60,7 +60,7 @@ EOL
             echo 'Deployment başarısız!'
         }
         aborted {
-            echo 'Pipeline iptal edildi!'
+            echo 'Pipeline iptal'
         }
     }
 }
